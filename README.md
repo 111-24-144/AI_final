@@ -61,36 +61,72 @@ TensorFlow 是谷歌开源的计算框架，可以很好地支持深度学习的
 ![Flow Chart](images/flowchart.png)
 *图一：分类网络模型流程图* 
 
-![Directories](images/directories.png)
+![Directories](images/directories.png)  
 *图二：数据集目录结构*  
 
 ### 数据预处理流程
 
 #### 1. 图片重命名
 ```python
-# 将所有图片按照 "类别-序号.jpg" 格式重命名
-# 例如：0-0.jpg, 0-1.jpg, 1-0.jpg, 1-1.jpg
+#数据图片rename
+#数据集路径：(self.image_path = "./picture/")
+   def rename(self):
+        listdir = os.listdir(self.image_path)
+        i = 0
+        while i < len(listdir):
+            images_list_dir = os.listdir(os.path.join(self.image_path, listdir[i]))
+            j = 0
+            while j < len(images_list_dir):
+                old_name = os.path.join(self.image_path, listdir[i], images_list_dir[j])
+                new_name = os.path.join(self.image_path, "%d-%d" % (i, j) + ".jpg")
+                os.rename(old_name, new_name)
+                j += 1
+            i += 1
+        for p in range(len(listdir)):
+            tmp_path = os.path.join(self.image_path, listdir[p])
+            if os.path.exists(tmp_path):
+                os.removedirs(tmp_path)
 ```
 
 #### 2. 图片尺寸统一
 ```python
-# 将所有图片resize为 200x200 像素
-# 确保输入CNN的图像尺寸一致
+#图片resize
+ def resize_img(self):
+        listdir = os.listdir(self.image_path)
+        for file in listdir:
+            file_path = os.path.join(self.image_path, file)
+            try:
+                imread = cv2.imread(file_path)
+                resize = cv2.resize(imread, (200, 200))
+                cv2.imwrite(os.path.join(self.image_path, file), resize)
+            except Exception:
+                os.remove(file_path)
+                continue
+
 ```
 
-![IMAGE_PLACEHOLDER_3]
+![After resize](images/after.png)  
 *图三：预处理后数据集示例*  
-**建议添加图片：** 展示4x4网格的处理后图片样例，每行代表一个类别
 
 #### 3. 数据转存为CSV
 ```python
-# 将图片路径和标签信息存储到CSV文件
-# 便于后续批量读取和训练
+#转存图片信息到csv文件
+#csv生成路径：(csv_file_saved_path = "./picture/")
+def train_data_to_csv(self):
+        files = os.listdir(self.image_path)
+        data = []
+        for file in files:
+            data.append({"path": self.image_path + file, "label": file[0]})
+
+        frame = pd.DataFrame(data, columns=['path', 'label'])
+        dummies = pd.get_dummies(frame['label'], 'label')
+        concat = pd.concat([frame, dummies], 1)
+        concat.to_csv(csv_file_saved_path + "train.csv")
+
 ```
 
-![IMAGE_PLACEHOLDER_4]
-*图四：数据集转存CSV示例*  
-**建议添加图片：** train.csv文件的表格截图，显示path、label等列
+![CSV DEMO](images/csv.png)  
+*图四：数据集转存CSV示例*
 
 ---
 
@@ -110,30 +146,71 @@ TensorFlow 是谷歌开源的计算框架，可以很好地支持深度学习的
    - 逐步降维：256 → 128 → 64 → 32 → 5
    - 最终输出5个类别的概率分布
 
-![IMAGE_PLACEHOLDER_5]
+![CNN](images/cnn.png)  
 *图五：神经网络结构图*  
-**建议添加图片：** 完整的CNN网络架构图，标注每层的参数和输出尺寸
 
 ### 训练过程
 
 ```python
-# 训练参数
-epochs = 100
-batch_size = 16
-learning_rate = 0.001
+#模型训练算法
+def build_model():
+    with tf.name_scope("input"):
+        x = tf.placeholder(tf.float32, [None, 200, 200, 3], "x")
+        y = tf.placeholder(tf.float32, [None, 5], "y")
 
-# 损失函数：Softmax Cross Entropy
-# 优化器：Adam Optimizer
-# 评估指标：Accuracy
+    with tf.variable_scope("conv_layer_1"):
+        conv1 = tf.layers.conv2d(x, 64, [3, 3], activation=tf.nn.relu, name='conv1')
+        max1 = tf.layers.max_pooling2d(conv1, [2, 2], [2, 2])
+        bn1 = tf.layers.batch_normalization(max1, name='bn1')
+        output1 = tf.layers.dropout(bn1, name='droput')
+
+    with tf.variable_scope("conv_layer_2"):
+        conv2 = tf.layers.conv2d(output1, 64, [3, 3], activation=tf.nn.relu, name='conv2')
+        max2 = tf.layers.max_pooling2d(conv2, [2, 2], [2, 2], name='max2')
+        bn2 = tf.layers.batch_normalization(max2)
+        output2 = tf.layers.dropout(bn2, name='dropout')
+
+    with tf.variable_scope("conv_layer_3"):
+        conv3 = tf.layers.conv2d(output2, 64, [3, 3], activation=tf.nn.relu, name='conv3')
+        max3 = tf.layers.max_pooling2d(conv3, [2, 2], [2, 2], name='max3')
+        bn3 = tf.layers.batch_normalization(max3, name='bn3')
+        output3 = bn3
+
+    with tf.variable_scope("conv_layer_4"):
+        conv4 = tf.layers.conv2d(output3, 32, [3, 3], activation=tf.nn.relu, name='conv4')
+        max4 = tf.layers.max_pooling2d(conv4, [2, 2], [2, 2], name='max4')
+        bn4 = tf.layers.batch_normalization(max4, name='bn4')
+        output = bn4
+        flatten = tf.layers.flatten(output, 'flatten')
+
+    with tf.variable_scope("fc_layer1"):
+        fc1 = tf.layers.dense(flatten, 256, activation=tf.nn.relu)
+        fc_bn1 = tf.layers.batch_normalization(fc1, name='bn1')
+        dropout1 = tf.layers.dropout(fc_bn1, 0.5)
+
+    with tf.variable_scope("fc_layer2"):
+        fc2 = tf.layers.dense(dropout1, 128, activation=tf.nn.relu)
+        dropout2 = tf.layers.dropout(fc2)
+
+    with tf.variable_scope("fc_layer3"):
+        fc3 = tf.layers.dense(dropout2, 64)
+        dropout3 = tf.layers.dropout(fc3)
+
+    with tf.variable_scope("fc_layer4"):
+        fc4 = tf.layers.dense(dropout3, 32)
+
+    with tf.variable_scope("fc_layer5"):
+        fc5 = tf.layers.dense(fc4, 5)
+
+    softmax = tf.nn.softmax(fc5, name='softmax')
+    predict = tf.argmax(softmax, axis=1)
+    loss = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits_v2(logits=fc5, labels=y, name='loss'))
+    tf.summary.scalar("loss", loss)
+    accuracy = tf.reduce_mean(tf.cast(tf.equal(predict, tf.argmax(y, axis=1)), tf.float32))
+    tf.summary.scalar("acc", accuracy)
+    merged = tf.summary.merge_all()
+    return x, y, predict, loss, accuracy, merged, softmax
 ```
-
-![IMAGE_PLACEHOLDER_6]
-*图六：训练过程输出*  
-**建议添加图片：** 终端输出截图，显示每个epoch的loss和accuracy变化
-
-![IMAGE_PLACEHOLDER_7]
-*图七：训练曲线*  
-**建议添加图片：** Loss曲线和Accuracy曲线图，展示训练过程的收敛情况
 
 ---
 
@@ -141,94 +218,72 @@ learning_rate = 0.001
 
 ### 实时识别功能
 
-本项目支持两种识别模式：
-
 #### 1. 图片识别模式
 ```python
-# 输入单张图片，输出分类结果和置信度
-predict_value(type='image', image_path='test.jpg')
+#利用模型实时识别图像
+    def predict_value(self, type='image', image_path=None):
+        saver = tf.train.Saver()
+        sess = tf.InteractiveSession()
+        saver.restore(sess, tf.train.latest_checkpoint("./h5_dell1/"))
+        if type == 'image':
+            assert image_path is not None
+            image = cv2.imread(image_path)
+            image = cv2.resize(image, (200, 200))
+            image = np.asarray(image, np.float32) / 255.
+            image = np.reshape(image, (1, image.shape[ 0 ], image.shape[ 1 ], image.shape[ 2 ]))
+            [ predict, probab ] = sess.run([ self.predict, self.probab ], feed_dict={self.x: image})
+           # predict = sess.run(self.predict, feed_dict={self.x: image})
+           # print("what? 1：",np.max(probab))
+           # print("what? 2：",predict[0])
+            return predict[0]
+            if (np.max(probab)<1):
+                print("recognise fail")
+                predict=4
+            print(predict)
+
+        elif type == 'video':
+            capture = cv2.VideoCapture(0)
+            while True:
+                ret, frame = capture.read()
+                resize = cv2.resize(frame, (200, 200))
+                x_ = np.asarray(resize, np.float32) / 255.
+                x_ = np.reshape(x_, [ 1, x_.shape[ 0 ], x_.shape[ 1 ], x_.shape[ 2 ] ])
+                [ predict, probab ] = sess.run([ self.predict, self.probab ], feed_dict={self.x: x_})
+                if predict == 0:
+                    cv2.putText(frame, "0 probab: %.3f" % np.max(probab), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                                (0, 0, 255), 2, cv2.LINE_AA)
+                elif predict == 1:
+                    cv2.putText(frame, "1 probab: %.3f" % np.max(probab), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                                (0, 255, 255), 2, cv2.LINE_AA)
+                elif predict == 2:
+                    cv2.putText(frame, "2 probab: %.3f" % np.max(probab), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                                (0, 255, 0), 2, cv2.LINE_AA)
+                elif predict == 3:
+                    cv2.putText(frame, "3 probab: %.3f" % np.max(probab), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                                (255, 0, 255), 2, cv2.LINE_AA)
+                elif predict == 4:
+                    cv2.putText(frame, "4 probab: %.3f" % np.max(probab), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                                (255, 0, 255), 2, cv2.LINE_AA)
+                if predict==3:
+                    print("1111")
+
+                print(predict)
+
+                cv2.imshow("recognized", frame)
+                key = cv2.waitKey(1)
+                if key == 27:
+                    break
+            cv2.destroyAllWindows()
+            capture.release()
 ```
 
-![IMAGE_PLACEHOLDER_8]
+![result1](images/result1.png)  
 *图八：蔬菜类图像识别结果*  
-**建议添加图片：** 一张蔬菜图片及其识别结果（标注类别和置信度）
 
-![IMAGE_PLACEHOLDER_9]
+![result2](images/result2.png)  
 *图九：易拉罐类图片识别效果*  
-**建议添加图片：** 一张易拉罐图片及其识别结果
 
-#### 2. 视频识别模式
-```python
-# 实时摄像头识别，动态显示分类结果
-predict_value(type='video')
-```
 
-![IMAGE_PLACEHOLDER_10]
-*图十：实时视频识别界面*  
-**建议添加图片：** 摄像头识别界面截图，显示实时分类结果
-
----
-
-## 🚀 运行说明
-
-### 在Google Colab中运行
-
-1. **克隆项目**
-```bash
-!git clone https://github.com/yourusername/cnn-image-classification.git
-%cd cnn-image-classification
-```
-
-2. **安装依赖**
-```bash
-!pip install -r requirements.txt
-```
-
-3. **准备数据集**
-```python
-# 上传数据集到Colab
-from google.colab import files
-uploaded = files.upload()
-```
-
-4. **运行数据预处理**
-```python
-!python data_preprocess.py
-```
-
-5. **训练模型**
-```python
-!python train.py
-```
-
-6. **测试模型**
-```python
-!python predict.py --image_path test.jpg
-```
-
-### 本地运行
-
-```bash
-# 1. 克隆项目
-git clone https://github.com/yourusername/cnn-image-classification.git
-cd cnn-image-classification
-
-# 2. 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 3. 安装依赖
-pip install -r requirements.txt
-
-# 4. 运行预处理
-python data_preprocess.py
-
-# 5. 训练模型
-python train.py
-
-# 6. 测试识别
-python predict.py --image_path test.jpg
-```
 
 ---
 
@@ -274,17 +329,6 @@ cnn-image-classification/
 
 ---
 
-## 🔧 依赖要求
-
-```
-tensorflow==2.x
-opencv-python==4.x
-pandas>=1.3.0
-numpy>=1.19.0
-matplotlib>=3.3.0
-```
-
----
 
 ## 💡 总结
 
@@ -296,20 +340,6 @@ matplotlib>=3.3.0
 - ✅ 详细的训练过程记录
 - ✅ 支持图片和视频实时识别
 - ✅ 适合Google Colab运行
-
----
-
-## 📞 联系方式
-
-如有问题，欢迎通过以下方式联系：
-- GitHub Issues: [项目地址](https://github.com/yourusername/cnn-image-classification)
-- Email: your.email@example.com
-
----
-
-## 📄 License
-
-本项目遵循 CC 4.0 BY-SA 版权协议
 
 ---
 
