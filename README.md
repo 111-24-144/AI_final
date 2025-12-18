@@ -1,6 +1,6 @@
 # 项目实战解析：基于深度学习搭建卷积神经网络模型算法，实现图像识别分类
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yourusername/cnn-image-classification/blob/main/notebook.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1UiY2XVhBpS6jkuivCjcqzvUEZ9PuXh5h?usp=drive_link)
 
 ## 📋 目录
 
@@ -344,5 +344,6 @@ cnn-image-classification/
 
 
 感谢所有为深度学习和计算机视觉领域做出贡献的研究者和开发者！
+
 
 
