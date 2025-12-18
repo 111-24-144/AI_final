@@ -296,13 +296,11 @@ def build_model():
 | Accuracy | 95.6% | 92.3% |
 | Loss | 0.124 | 0.189 |
 
-![IMAGE_PLACEHOLDER_11]
+![Confusion Matrix](images/confusion.png)  
 *图十一：混淆矩阵*  
-**建议添加图片：** 4x4混淆矩阵热力图，展示各类别的识别准确率
 
-![IMAGE_PLACEHOLDER_12]
+![Bar Image](images/accuracy.png)  
 *图十二：各类别识别准确率柱状图*  
-**建议添加图片：** 柱状图显示4个类别的precision、recall、f1-score
 
 ---
 
