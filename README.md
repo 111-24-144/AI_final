@@ -31,19 +31,19 @@
 
 ### 1. Python
 Python 是一個高層次的結合了解釋性、編譯性、互動性和物件導向的腳本語言。
-- 學習連結：[Python学习](https://www.runoob.com/python3/python3-intro.html)
+- 學習連結：[Python學習](https://www.runoob.com/python3/python3-intro.html)
 
 ### 2. OpenCV
 OpenCV 是一個開源的跨平台計算機視覺庫，實現了圖像處理和計算機視覺方面的許多通用演算法。
-- 學習連結：[OpenCV学习](https://docs.opencv.org/4.x/index.html)
+- 學習連結：[OpenCV學習](https://docs.opencv.org/4.x/index.html)
 
 ### 3. TensorFlow
 TensorFlow 是Google開源的計算框架，可以很好地支援深度學習的各種演算法。
-- 學習連結：[TensorFlow学习](https://tensorflow.google.cn/)
+- 學習連結：[TensorFlow學習](https://tensorflow.google.cn/)
 
-### 4. CNN (卷積神經網絡)
-卷積神經網路是一類包含卷積計算且具有深度結構的前饋神經網絡，是深度學習的代表性演算法之一。
-- 學習連結：[CNN学习](https://xie.infoq.cn/article/c4d846096c92c7dfcd6539075)
+### 4. CNN (卷積神經網路)
+卷積神經網路是一類包含卷積計算且具有深度結構的前饋神經網路，是深度學習的代表性演算法之一。
+- 學習連結：[CNN學習](https://xie.infoq.cn/article/c4d846096c92c7dfcd6539075)
 
 ---
 
@@ -338,6 +338,7 @@ cnn-image-classification/
 - ✅ 詳細的訓練過程記錄
 - ✅ 支援圖片和視訊即時識別
 - ✅ 適合Google Colab運行
+
 
 
 
