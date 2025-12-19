@@ -1,74 +1,74 @@
-# 项目实战解析：基于深度学习搭建卷积神经网络模型算法，实现图像识别分类
+# 專案實戰解析：基於深度學習建構卷積神經網路模型演算法，實現影像辨識分類
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1UiY2XVhBpS6jkuivCjcqzvUEZ9PuXh5h?usp=drive_link)
 
-## 📋 目录
+## 📋 目錄
 
 - [前言](#前言)
-- [基础知识介绍](#基础知识介绍)
-- [数据集收集](#数据集收集)
-- [模型训练](#模型训练)
-- [图像识别分类](#图像识别分类)
+- [基礎知識介紹](#基礎知識介紹)
+- [數據集收集](#數據集收集)
+- [模型訓練](#模型訓練)
+- [圖像辨識分類](#圖像辨識分類)
 - [结果展示](#结果展示)
 
 ---
 
 ## 前言
 
-随着人工智能的不断发展，深度学习这门技术也越来越重要，很多人都开启了学习机器学习。本项目通过实战案例，带领大家从零开始设计实现一款基于深度学习的图像识别算法。
+隨著人工智慧的不斷發展，深度學習這門技術也越來越重要，許多人開啟了學習機器學習。本專案透過實戰案例，帶領大家從零開始設計實現一款基於深度學習的影像辨識演算法。
 
-**学习本项目内容，你需要掌握以下基础知识：**
+**學習本計畫內容，你需要掌握以下基礎知識：**
 
-1. Python 基础语法
-2. 计算机视觉库 (OpenCV)
-3. 深度学习框架 (TensorFlow)
-4. 卷积神经网络 (CNN)
+1. Python 基礎語法
+2. 計算機視覺庫 (OpenCV)
+3. 深度學習框架 (TensorFlow)
+4. 卷積神經網絡 (CNN)
 
 ---
 
 ## 基础知识介绍
 
 ### 1. Python
-Python 是一个高层次的结合了解释性、编译性、互动性和面向对象的脚本语言。
-- 学习链接：[Python学习](https://www.runoob.com/python3/python3-intro.html)
+Python 是一個高層次的結合了解釋性、編譯性、互動性和物件導向的腳本語言。
+- 學習連結：[Python学习](https://www.runoob.com/python3/python3-intro.html)
 
 ### 2. OpenCV
-OpenCV 是一个开源的跨平台计算机视觉库，实现了图像处理和计算机视觉方面的很多通用算法。
-- 学习链接：[OpenCV学习](https://docs.opencv.org/4.x/index.html)
+OpenCV 是一個開源的跨平台計算機視覺庫，實現了圖像處理和計算機視覺方面的許多通用演算法。
+- 學習連結：[OpenCV学习](https://docs.opencv.org/4.x/index.html)
 
 ### 3. TensorFlow
-TensorFlow 是谷歌开源的计算框架，可以很好地支持深度学习的各种算法。
-- 学习链接：[TensorFlow学习](https://tensorflow.google.cn/)
+TensorFlow 是Google開源的計算框架，可以很好地支援深度學習的各種演算法。
+- 學習連結：[TensorFlow学习](https://tensorflow.google.cn/)
 
-### 4. CNN (卷积神经网络)
-卷积神经网络是一类包含卷积计算且具有深度结构的前馈神经网络，是深度学习的代表算法之一。
-- 学习链接：[CNN学习](https://xie.infoq.cn/article/c4d846096c92c7dfcd6539075)
+### 4. CNN (卷積神經網絡)
+卷積神經網路是一類包含卷積計算且具有深度結構的前饋神經網絡，是深度學習的代表性演算法之一。
+- 學習連結：[CNN学习](https://xie.infoq.cn/article/c4d846096c92c7dfcd6539075)
 
 ---
 
-## 数据集收集
+## 數據集收集
 
-本案例以实现**垃圾分类识别**作为最终目标，数据集包含四类图片：
+本案例以實現**垃圾分類識別**作為最終目標，數據集包含四類圖片：
 
-- 厨余垃圾 (Kitchen waste)
+- 廚餘垃圾 (Kitchen waste)
 - 可回收垃圾 (Recyclable)
 - 有毒垃圾 (Hazardous)
 - 其它垃圾 (Other)
 
-每类图片数据集规模为200张（学习者可根据需求选择数据集类型及规模）。
+每類圖片數據集規模為200張（學習者可依需求選擇數據集類型及規模）。
 
 ![Flow Chart](images/flowchart.png)
-*图一：分类网络模型流程图* 
+*圖一：分類網路模型流程圖* 
 
 ![Directories](images/directories.png)  
-*图二：数据集目录结构*  
+*圖二：數據集目錄結構*  
 
-### 数据预处理流程
+### 數據預處理流程
 
-#### 1. 图片重命名
+#### 1. 圖片重命名
 ```python
-#数据图片rename
-#数据集路径：(self.image_path = "./picture/")
+#數據圖片rename
+#數據集路徑：(self.image_path = "./picture/")
    def rename(self):
         listdir = os.listdir(self.image_path)
         i = 0
@@ -87,9 +87,9 @@ TensorFlow 是谷歌开源的计算框架，可以很好地支持深度学习的
                 os.removedirs(tmp_path)
 ```
 
-#### 2. 图片尺寸统一
+#### 2. 圖片尺寸统一
 ```python
-#图片resize
+#圖片resize
  def resize_img(self):
         listdir = os.listdir(self.image_path)
         for file in listdir:
@@ -105,12 +105,12 @@ TensorFlow 是谷歌开源的计算框架，可以很好地支持深度学习的
 ```
 
 ![After resize](images/after.png)  
-*图三：预处理后数据集示例*  
+*圖三：預處理後數據集範例*  
 
-#### 3. 数据转存为CSV
+#### 3. 數據轉存為CSV
 ```python
-#转存图片信息到csv文件
-#csv生成路径：(csv_file_saved_path = "./picture/")
+#轉存圖片信息到csv文件
+#csv生成路徑：(csv_file_saved_path = "./picture/")
 def train_data_to_csv(self):
         files = os.listdir(self.image_path)
         data = []
@@ -125,33 +125,33 @@ def train_data_to_csv(self):
 ```
 
 ![CSV DEMO](images/csv.png)  
-*图四：数据集转存CSV示例*
+*圖四：數據集轉存CSV示例*
 
 ---
 
-## 模型训练
+## 模型訓練
 
-### 网络结构设计
+### 網路結構設計
 
-本项目采用深度卷积神经网络，包含以下层次：
+本項目採用深度卷積神經網路，包含以下層次：
 
-1. **卷积层1-4** (Conv Layer)
-   - 卷积层：特征提取
-   - 池化层：降维
-   - 批归一化：加速收敛
-   - Dropout：防止过拟合
+1. **卷積層1-4** (Conv Layer)
+   - 卷積層：特徵提取
+   - 池化層：降維
+   - 批歸一化：加速收斂
+   - Dropout：防止過擬合
 
-2. **全连接层1-5** (FC Layer)
-   - 逐步降维：256 → 128 → 64 → 32 → 5
-   - 最终输出5个类别的概率分布
+2. **全連接層1-5** (FC Layer)
+   - 逐步降維：256 → 128 → 64 → 32 → 5
+   - 最終輸出5個類別的機率分佈
 
 ![CNN](images/cnn.png)  
-*图五：神经网络结构图*  
+*圖五：神經網路結構圖*  
 
-### 训练过程
+### 訓練過程
 
 ```python
-#模型训练算法
+#模型訓練算法
 def build_model():
     with tf.name_scope("input"):
         x = tf.placeholder(tf.float32, [None, 200, 200, 3], "x")
@@ -213,13 +213,13 @@ def build_model():
 
 ---
 
-## 图像识别分类
+## 圖像識別分類
 
-### 实时识别功能
+### 即時辨識功能
 
-#### 1. 图片识别模式
+#### 1. 圖片辨識模式
 ```python
-#利用模型实时识别图像
+#利用模型即時辨識影像
     def predict_value(self, type='image', image_path=None):
         saver = tf.train.Saver()
         sess = tf.InteractiveSession()
@@ -277,73 +277,64 @@ def build_model():
 ```
 
 ![result1](images/result1.png)  
-*图八：蔬菜类图像识别结果*  
+*圖八：蔬菜類圖像辨識結果*  
 
 ![result2](images/result2.png)  
-*图九：易拉罐类图片识别效果*  
+*圖九：易拉罐類圖片辨識效果*  
 
 
 
 ---
 
-## 结果展示
+## 結果展示
 
-### 性能指标
+### 性能指標
 
-| 指标 | 训练集 | 测试集 |
+| 指標 | 訓練集 | 測試集 |
 |------|--------|--------|
 | Accuracy | 95.6% | 92.3% |
 | Loss | 0.124 | 0.189 |
 
 ![Confusion Matrix](images/confusion.png)  
-*图十一：混淆矩阵*  
+*圖十一：混淆矩陣*  
 
 ![Bar Image](images/accuracy.png)  
-*图十二：各类别识别准确率柱状图*  
+*圖十二：各類別辨識準確率長條圖*  
 
 ---
 
-## 项目结构
+## 專案結構
 
 ```
 cnn-image-classification/
-├── picture/               # 数据集目录
+├── picture/               # 數據集目錄
 │   ├── 0-0.jpg
 │   ├── 0-1.jpg
 │   └── ...
-├── h5_dell/              # 训练模型保存目录
+├── h5_dell/              # 訓練模型保存目錄
 │   ├── mode.ckpt.data
 │   ├── mode.ckpt.index
 │   └── ...
-├── log/                  # TensorBoard日志
-├── data_preprocess.py    # 数据预处理脚本
-├── train.py              # 模型训练脚本
-├── predict.py            # 图像识别脚本
-├── requirements.txt      # 依赖包
+├── log/                  # TensorBoard日誌
+├── data_preprocess.py    # 數據預處理腳本
+├── train.py              # 模型訓練腳本
+├── predict.py            # 圖像識別腳本
+├── requirements.txt      # 依賴套件
 ├── notebook.ipynb        # Jupyter Notebook
-└── README.md             # 项目说明
+└── README.md             # 項目說明
 ```
 
 ---
 
 
-## 总结
+## 總结
 
-本项目以实际案例介绍了神经网络图像识别算法的搭建及使用详细步骤，介绍了卷积神经网络实现图像识别分类的详细过程，以及实现效果的展示。
+本專案以實際案例介紹了神經網路影像辨識演算法的建構及使用詳細步驟，介紹了卷積神經網路實現影像辨識分類的詳細過程，以及實現效果的展示。
 
-**项目亮点：**
-- ✅ 完整的数据预处理流程
-- ✅ 清晰的CNN网络架构
-- ✅ 详细的训练过程记录
-- ✅ 支持图片和视频实时识别
-- ✅ 适合Google Colab运行
-
----
-
-## 致谢
-
-
-感谢所有为深度学习和计算机视觉领域做出贡献的研究者和开发者！
-
-
+**項目亮點：**
+- ✅ 完整的數據預處理流程
+- ✅ 清晰的CNN網路架構
+- ✅ 詳細的訓練過程記錄
+- ✅ 支援圖片和視訊即時識別
+- ✅ 適合Google Colab運行
 
