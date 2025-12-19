@@ -1,4 +1,4 @@
-# 專案實戰解析：基於深度學習建構卷積神經網路模型演算法，實現影像辨識分類
+# 專案實戰解析：基於深度學習建構卷積神經網路模型演算法，實現圖像辨識分類
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1UiY2XVhBpS6jkuivCjcqzvUEZ9PuXh5h?usp=drive_link)
 
@@ -338,6 +338,7 @@ cnn-image-classification/
 - ✅ 詳細的訓練過程記錄
 - ✅ 支援圖片和視訊即時識別
 - ✅ 適合Google Colab運行
+
 
 
 
