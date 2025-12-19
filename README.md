@@ -23,7 +23,7 @@
 1. Python 基礎語法
 2. 計算機視覺庫 (OpenCV)
 3. 深度學習框架 (TensorFlow)
-4. 卷積神經網絡 (CNN)
+4. 卷積神經網路 (CNN)
 
 ---
 
@@ -338,6 +338,7 @@ cnn-image-classification/
 - ✅ 詳細的訓練過程記錄
 - ✅ 支援圖片和視訊即時識別
 - ✅ 適合Google Colab運行
+
 
 
 
